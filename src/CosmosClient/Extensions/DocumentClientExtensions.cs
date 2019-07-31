@@ -10,8 +10,8 @@ namespace CosmosClient.Extensions
     {
         public static async Task ScaleAsync(this IDocumentClient documentClient, string database, string collection, int scaleBatch, int minThroughput, int maxThroughput)
         {
-            var offer = await documentClient.GetOfferAsync(database, collection).ConfigureAwait(false);
-            await documentClient.ScaleAsync(offer, scaleBatch, minThroughput, maxThroughput).ConfigureAwait(false);
+            var offer = await documentClient.GetOfferAsync(database, collection);
+            await documentClient.ScaleAsync(offer, scaleBatch, minThroughput, maxThroughput);
         }
 
         public static async Task ScaleAsync(this IDocumentClient documentClient, OfferV2 offer, int scaleBatch, int minThroughput, int maxThroughput)
@@ -29,17 +29,17 @@ namespace CosmosClient.Extensions
                 newThroughput = maxThroughput;
             }
             var updatedOffer = new OfferV2(offer, newThroughput);
-            await documentClient.ReplaceOfferAsync(updatedOffer).ConfigureAwait(false);
+            await documentClient.ReplaceOfferAsync(updatedOffer);
         }
 
         public static async Task<OfferV2> GetOfferAsync(this IDocumentClient documentClient, string databaseName, string collectionName = null)
         {
             if (string.IsNullOrEmpty(collectionName))
             {
-                return await documentClient.GetDatabaseOfferAsync(databaseName).ConfigureAwait(false);
+                return await documentClient.GetDatabaseOfferAsync(databaseName);
             }
-            return await documentClient.GetCollectionOfferAsync(databaseName, collectionName).ConfigureAwait(false) ??
-                    await documentClient.GetDatabaseOfferAsync(databaseName).ConfigureAwait(false);
+            return await documentClient.GetCollectionOfferAsync(databaseName, collectionName) ??
+                    await documentClient.GetDatabaseOfferAsync(databaseName);
         }
 
         public static async Task<OfferV2> GetOfferFromSelfLinkAsync(this IDocumentClient documentClient, string selfLink)
@@ -47,21 +47,21 @@ namespace CosmosClient.Extensions
             return (await documentClient.CreateOfferQuery()
                 .Where(o => o.ResourceLink == selfLink)
                 .AsDocumentQuery()
-                .ExecuteNextAsync<OfferV2>().ConfigureAwait(false)).FirstOrDefault();
+                .ExecuteNextAsync<OfferV2>()).FirstOrDefault();
         }
 
         private static async Task<OfferV2> GetDatabaseOfferAsync(this IDocumentClient documentClient, string databaseName)
         {
             var databaseUri = UriFactory.CreateDatabaseUri(databaseName);
-            var database = (await documentClient.ReadDatabaseAsync(databaseUri).ConfigureAwait(false)).Resource;
+            var database = (await documentClient.ReadDatabaseAsync(databaseUri)).Resource;
 
-            return await documentClient.GetOfferFromSelfLinkAsync(database.SelfLink).ConfigureAwait(false);
+            return await documentClient.GetOfferFromSelfLinkAsync(database.SelfLink);
         }
 
         private static async Task<OfferV2> GetCollectionOfferAsync(this IDocumentClient documentClient, string databaseName, string collectionName)
         {
             var collectionUri = UriFactory.CreateDocumentCollectionUri(databaseName, collectionName);
-            var collection = (await documentClient.ReadDocumentCollectionAsync(collectionUri).ConfigureAwait(false)).Resource;
+            var collection = (await documentClient.ReadDocumentCollectionAsync(collectionUri)).Resource;
 
             return await documentClient.GetOfferFromSelfLinkAsync(collection.SelfLink);
         }

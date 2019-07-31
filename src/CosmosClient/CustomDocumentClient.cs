@@ -57,20 +57,20 @@ namespace CosmosClient
 
         public async Task<T> ExecuteAsync<T>(Func<IDocumentClient, Task<T>> func, string database, string collection, int retries = 0)
         {
-            return await ExecuteAsync(func, database, collection, _config.MinThroughput, _config.MaxThroughput, _config.ScaleUpBatch, retries).ConfigureAwait(false);
+            return await ExecuteAsync(func, database, collection, _config.MinThroughput, _config.MaxThroughput, _config.ScaleUpBatch, retries);
         }
 
         public async Task<T> ExecuteAsync<T>(Func<IDocumentClient, Task<T>> func, string database, string collection, int minThroughput, int maxThroughput, int scaleUpBatch, int retries = 0)
         {
             try
             {
-                return await func(_documentClient).ConfigureAwait(false);
+                return await func(_documentClient);
             }
             catch (DocumentClientException exception) when (exception.Message.Contains(ExceptionMessage))
             {
                 retries++;
-                await _documentClient.ScaleAsync(database, collection, scaleUpBatch, minThroughput, maxThroughput).ConfigureAwait(false);
-                if (retries < _config.MaxRetries) return await ExecuteAsync(func, database, collection, minThroughput, maxThroughput, scaleUpBatch, retries).ConfigureAwait(false);
+                await _documentClient.ScaleAsync(database, collection, scaleUpBatch, minThroughput, maxThroughput);
+                if (retries < _config.MaxRetries) return await ExecuteAsync(func, database, collection, minThroughput, maxThroughput, scaleUpBatch, retries);
                 throw;
             }
         }
@@ -81,18 +81,18 @@ namespace CosmosClient
 
             foreach (var database in databases)
             {
-                var offer = await _documentClient.GetOfferFromSelfLinkAsync(database.SelfLink).ConfigureAwait(false);
+                var offer = await _documentClient.GetOfferFromSelfLinkAsync(database.SelfLink);
 
                 if (offer != null)
                 {
-                    await _documentClient.ScaleAsync(offer, _config.ScaleDownBatch, _config.MinThroughput, _config.MaxThroughput).ConfigureAwait(false);
+                    await _documentClient.ScaleAsync(offer, _config.ScaleDownBatch, _config.MinThroughput, _config.MaxThroughput);
                 }
                 else
                 {
                     var collections = _documentClient.CreateDocumentCollectionQuery(database.SelfLink).ToList();
                     foreach (var collection in collections)
                     {
-                        offer = await _documentClient.GetOfferFromSelfLinkAsync(collection.SelfLink).ConfigureAwait(false);
+                        offer = await _documentClient.GetOfferFromSelfLinkAsync(collection.SelfLink);
                         await _documentClient.ScaleAsync(offer, _config.ScaleDownBatch, _config.MinThroughput, _config.MaxThroughput);
                     }
                 }

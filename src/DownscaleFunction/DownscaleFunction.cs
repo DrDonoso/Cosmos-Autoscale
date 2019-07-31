@@ -21,7 +21,7 @@ namespace DownscaleFunction
 
             var customClient = CustomDocumentClient.Of(cosmosUrl, cosmosAuthKey);
 
-            await customClient.ScaleDownAll().ConfigureAwait(false);
+            await customClient.ScaleDownAll();
         }
     }
 }

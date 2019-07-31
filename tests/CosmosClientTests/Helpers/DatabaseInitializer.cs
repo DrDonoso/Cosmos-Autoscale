@@ -25,13 +25,13 @@ namespace CosmosClientTests.Helpers
 
         public async Task Initialize(CosmosEnvironment cosmosEnvironment)
         {
-            await TruncateEnvironment().ConfigureAwait(false);
+            await TruncateEnvironment();
             foreach (var database in cosmosEnvironment.Databases)
             {
-                await CreateDatabase(database.Name, database.RequestOptions).ConfigureAwait(false);
+                await CreateDatabase(database.Name, database.RequestOptions);
                 foreach (var collection in database.Collections)
                 {
-                    await CreateCollection(database.Name, collection.Name, collection.RequestOptions).ConfigureAwait(false);
+                    await CreateCollection(database.Name, collection.Name, collection.RequestOptions);
                 }
             }
         }
@@ -41,13 +41,13 @@ namespace CosmosClientTests.Helpers
             var databases = _documentClient.CreateDatabaseQuery().AsEnumerable().ToList();
             foreach (var database in databases)
             {
-                await _documentClient.DeleteDatabaseAsync(database.SelfLink).ConfigureAwait(false);
+                await _documentClient.DeleteDatabaseAsync(database.SelfLink);
             }
         }
 
         private async Task CreateDatabase(string database, RequestOptions requestOptions = null)
         {
-            await _documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = database }, requestOptions).ConfigureAwait(false);
+            await _documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = database }, requestOptions);
         }
 
         private async Task CreateCollection(string database, string collection, RequestOptions requestOptions = null)
@@ -57,7 +57,7 @@ namespace CosmosClientTests.Helpers
             var documentCollection = new DocumentCollection { Id = collection };
             documentCollection.PartitionKey.Paths.Add("/Language");
 
-            await _documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri, documentCollection, requestOptions).ConfigureAwait(false);
+            await _documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri, documentCollection, requestOptions);
         }
     }
 }

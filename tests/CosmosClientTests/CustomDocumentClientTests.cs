@@ -49,7 +49,7 @@ namespace CosmosClientTests
         [TestInitialize]
         public async Task TestInitializer()
         {
-            await InitializeDatabase().ConfigureAwait(false);
+            await InitializeDatabase();
         }
 
         [TestMethod]
@@ -59,18 +59,18 @@ namespace CosmosClientTests
         {
             var funcAsync = new Mock<Func<IDocumentClient, Task<ResourceResponse<Document>>>>();
             funcAsync.Setup(x => x.Invoke(It.IsAny<IDocumentClient>())).Throws(_documentClientException);
-            var previousOffer = await _documentClient.GetOfferAsync(database, collection).ConfigureAwait(false);
+            var previousOffer = await _documentClient.GetOfferAsync(database, collection);
 
             try
             {
-                await _customDocumentClient.ExecuteAsync(funcAsync.Object, database, collection).ConfigureAwait(false);
+                await _customDocumentClient.ExecuteAsync(funcAsync.Object, database, collection);
             }
             catch
             {
                 // ignored
             }
 
-            var newOffer = await _documentClient.GetOfferAsync(database, collection).ConfigureAwait(false);
+            var newOffer = await _documentClient.GetOfferAsync(database, collection);
 
             Assert.IsTrue(newOffer.Content.OfferThroughput > previousOffer.Content.OfferThroughput);
         }
@@ -82,7 +82,7 @@ namespace CosmosClientTests
         {
             var func = new Mock<Func<IDocumentClient, ResourceResponse<Document>>>();
             func.Setup(x => x.Invoke(It.IsAny<IDocumentClient>())).Throws(_documentClientException);
-            var previousOffer = await _documentClient.GetOfferAsync(database, collection).ConfigureAwait(false);
+            var previousOffer = await _documentClient.GetOfferAsync(database, collection);
 
             try
             {
@@ -93,7 +93,7 @@ namespace CosmosClientTests
                 // ignored
             }
 
-            var newOffer = await _documentClient.GetOfferAsync(database, collection).ConfigureAwait(false);
+            var newOffer = await _documentClient.GetOfferAsync(database, collection);
 
             Assert.IsTrue(newOffer.Content.OfferThroughput > previousOffer.Content.OfferThroughput);
         }
@@ -104,11 +104,11 @@ namespace CosmosClientTests
         [DataRow("Videoclub", "Movies")]
         public async Task ScaleDown_ShouldScaleDownAll(string database, string collection)
         {
-            var previousOffer = await _documentClient.GetOfferAsync(database, collection).ConfigureAwait(false);
+            var previousOffer = await _documentClient.GetOfferAsync(database, collection);
 
-            await _customDocumentClient.ScaleDownAll().ConfigureAwait(false);
+            await _customDocumentClient.ScaleDownAll();
 
-            var newOffer = await _documentClient.GetOfferAsync(database, collection).ConfigureAwait(false);
+            var newOffer = await _documentClient.GetOfferAsync(database, collection);
 
             Assert.IsTrue(newOffer.Content.OfferThroughput < previousOffer.Content.OfferThroughput);
         }
@@ -142,7 +142,7 @@ namespace CosmosClientTests
                     }
                 }
             };
-            await _databaseHelper.Initialize(env).ConfigureAwait(false);
+            await _databaseHelper.Initialize(env);
         }
     }
 }
