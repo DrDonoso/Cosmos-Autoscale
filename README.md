@@ -1,6 +1,6 @@
 # CosmosDB Autoscale
 
-Tool for autoscale cosmos. 
+Tool for autoscaling cosmos. 
 
 
 # Usage
@@ -9,7 +9,7 @@ First of all initialize CustomDocumentClient with Url and Authkey.
 var customDocumentClient = CustomDocumentClient.Of("Url", "Authkey");
 ```
 
-If you initialize like this, you will have default settings if you use the common executeasync. To Initialize with settings:
+If you initialize it like this, you will have default settings if you use the common executeasync. To Initialize with settings:
 
 ```c#
 var customConfiguration = new CustomConfiguration {
